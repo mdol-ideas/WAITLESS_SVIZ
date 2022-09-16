@@ -2,7 +2,7 @@ import utime as time
 import uasyncio as asyncio
 import machine
 
-from setup import *
+from configure import *
 from lcd_i2c_printer import *
 from urbanbus import bus_service
         
