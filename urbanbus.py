@@ -42,7 +42,7 @@ def sel_next_bus_each_line(api_data):
         if i['lineNumber'] not in control:
             next_bus.append([i['lineNumber'],i['waitTime']])
             control.append(i['lineNumber'])
-            if all(list(map(lambda a: ':' in a[1], times))):
+            if all(list(map(lambda a: ':' in a[1], next_bus))):
                 next_bus.sort(key = lambda x: int(x[1].replace(':','')))
                 first_bus_time = next_bus[0][1].split(':')
                 delay = how_much_to(first_bus_time) - 30 * 60
@@ -100,7 +100,7 @@ def handle_api_responses(schedule, HTTPResponseCode): # Llamar con callForData(u
 
 #Launch the bus service
 def bus_service():
-    from setup import read_config_file
+    from configure import read_config_file
     
     global count_500
     count_500 = 0

@@ -133,7 +133,7 @@ def show_wait_time(arrivals, delay=60): # Optimized to show arrivals data
 async def info_during_setup(lines):   #Asynchronous message carrousel 
     import uasyncio as asyncio
     global finish_countdown
-    from setup import finish_countdown
+    from configure import finish_countdown
         
     
     def optimize(text):
@@ -150,6 +150,6 @@ async def info_during_setup(lines):   #Asynchronous message carrousel
         post = next(step)
         print_on_lcd_dumb(optimize(ant) + optimize(post))
         await asyncio.sleep(2)
-        from setup import finish_countdown
+        from configure import finish_countdown
 
         
