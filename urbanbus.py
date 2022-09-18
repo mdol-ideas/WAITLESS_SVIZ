@@ -24,8 +24,8 @@ def how_much_to(value):
     now      = time.localtime()
     after    = list(now)
 
-    if now[3] <= h:
-        if now[4] <= m:
+    if now[3] >= h:
+        if now[4] >= m:
             after[2] = after[2] + 1
     after[3],after[4] = h, m
     
