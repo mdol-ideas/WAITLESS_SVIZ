@@ -1,16 +1,25 @@
 
 def url(stopid): 
-    return 'https://api.interurbanos.welbits.com/v1/stop/' + stopid
-
+    url_welbits = f'https://api.interurbanos.welbits.com/v1/stop/{stopid}'    
+    url_crtm    = f'https://www.crtm.es/widgets/api/GetStopsTimes.php?codStop=8_{stopid}&type=1&orderBy=2&stopTimesByIti=3'
+    
+    return url_crtm
 
 #Call to API and get json data
 def call_for_data(url):
     try:
         import urequests as requests
-    except ImportError:
+    except ImportError:       
         import requests
-    r           = requests.get(url = url)
-    json_data   = r.json() #r.text.json()
+        
+    r               = requests.get(url = url)   
+    try:
+        json_data   = r.json() #r.text.json()
+        status_code     = r.status_code
+        
+    except ValueError:
+        status_code = 500
+        
     status_code = r.status_code
     #print('Testeo si ejecuta r.close')
     r.close()
@@ -31,9 +40,55 @@ def how_much_to(value):
     
     return time.mktime(tuple(after)) - time.time()
 
+def date_ticks_from_date_str(date_str):
+    import utime as time
+    
+   #0    5    10   15   20   25#
+   #:....:....:....:....:....: 
+   # 2022-09-19T17:29:16+02:00
+   # YYYY-MM-DDThh:mm:ss+xx:xx
+   
+    now = time.localtime()
+    
+    Y         = int(date_str[0:4])
+    M         = int(date_str[5:7])
+    D         = int(date_str[8:10])
+    h         = int(date_str[11:13])
+    m         = int(date_str[14:16])
+    s         = int(date_str[17:19])
+    w         = now[6]
+    y         = now[7]
+    
+    date_time = (Y,M,D,h,m,s,w,y)
+        
+    return time.mktime((Y,M,D,h,m,s,w,y))
+    
 
 #Filter for the next arrival for each line
-def sel_next_bus_each_line(api_data):
+def sel_next_bus_each_line(api_data): #sel_next_bus_each_line_crtm
+    
+    actual_date       = api_data['stopTimes']['actualDate']
+    ticks_actual_date = date_ticks_from_date_str(actual_date) 
+    data              = api_data['stopTimes']['times']['Time']
+    
+    next_bus = [] ; control = []
+    
+    for i in data:
+        if i['line']['shortDescription'] not in control:
+            wait_time = int ((date_ticks_from_date_str(i['time']) - ticks_actual_date) / 60 )
+            if wait_time < 60:
+                wait_time = str(wait_time) + ' min'
+            else:
+                wait_time = i['time'][11:16]
+            
+            next_bus.append([i['line']['shortDescription'],wait_time])
+            control.append(i['line']['shortDescription'])
+            
+            manage_time_out_of_service(next_bus)
+                
+    return next_bus  # output: list
+
+def sel_next_bus_each_line_welbits(api_data):
     import utime as time
     
     next_bus = [] ; control = []
@@ -49,6 +104,15 @@ def sel_next_bus_each_line(api_data):
                 time.sleep(delay)
                 
     return next_bus  # output: list
+
+def manage_time_out_of_service(next_bus):
+    import utime as time
+    
+    if all(list(map(lambda a: ':' in a[1], next_bus))):
+        next_bus.sort(key = lambda x: int(x[1].replace(':','')))
+        first_bus_time = next_bus[0][1].split(':')
+        delay = how_much_to(first_bus_time) - 30 * 60
+        time.sleep(delay)
 
 
 #Manage the behaivor according to the API response
