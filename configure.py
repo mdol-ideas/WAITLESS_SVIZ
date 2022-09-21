@@ -24,7 +24,7 @@ def read_config_file():
       "about": {
         "name": "WAITLESS",
         "model": "SVIZ",
-        "version": "0.4.2a0"
+        "version": "0.4.3a0"
       }
     }
     """ 

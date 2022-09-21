@@ -23,6 +23,7 @@ def call_for_data(url):
     status_code = r.status_code
     #print('Testeo si ejecuta r.close')
     r.close()
+    print(json_data)
     return json_data, status_code
 
 
@@ -60,7 +61,7 @@ def date_ticks_from_date_str(date_str):
     y         = now[7]
     
     date_time = (Y,M,D,h,m,s,w,y)
-        
+    print(date_time)    
     return time.mktime((Y,M,D,h,m,s,w,y))
     
 
@@ -68,14 +69,19 @@ def date_ticks_from_date_str(date_str):
 def sel_next_bus_each_line(api_data): #sel_next_bus_each_line_crtm
     
     actual_date       = api_data['stopTimes']['actualDate']
-    ticks_actual_date = date_ticks_from_date_str(actual_date) 
-    data              = api_data['stopTimes']['times']['Time']
+    ticks_actual_date = date_ticks_from_date_str(actual_date)
+    try:
+        data              = api_data['stopTimes']['times']['Time']
+    except:
+        data = []
+    print('hay ' + str(len(data))+ ' regristros')
     
     next_bus = [] ; control = []
     
     for i in data:
         if i['line']['shortDescription'] not in control:
             wait_time = int ((date_ticks_from_date_str(i['time']) - ticks_actual_date) / 60 )
+            print(wait_time)
             if wait_time < 60:
                 wait_time = str(wait_time) + ' min'
             else:
@@ -175,4 +181,5 @@ def bus_service():
         break_while = handle_api_responses(schedule, HTTPResponseCode)
         if break_while == True:
             break
+
 
