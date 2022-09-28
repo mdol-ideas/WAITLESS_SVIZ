@@ -6,7 +6,7 @@ from configure import *
 from lcd_i2c_printer import *
 from urbanbus import bus_service
         
-text_added      = 'Powered by welbits.com'
+text_added      = 'Powered by CRTM'
 
 # Read de configuration files                       
 config          = read_config_file()
@@ -14,12 +14,13 @@ config_client   = config['configuration']['network']['client']
 stopid          = config['settings']['stopid']
 
 # Boot message sequence
-name  = config['about']['name']
-model = config['about']['model']
+name    = config['about']['name']
+model   = config['about']['model']
+version = config['about']['version']
 
 print_on_lcd(name)
 time.sleep(1)
-print_on_lcd(name, 'Model: '+ model)
+print_on_lcd(name, model + ' ' + version)
 time.sleep(2)
 moving_message(text_added,
                1,

@@ -21,6 +21,12 @@ def loop(list): # Iter lists in eternal way
     while True:
         for item in list:
             yield item
+            
+def background_light_off():
+    lcd.backlight_off()
+    
+def background_light_on():
+    lcd.backlight_on()
 
 
 def print_on_lcd_dumb(text): # Simplier write on LCD
@@ -41,6 +47,8 @@ def print_on_lcd(text1, text2 = '', centered = True): # Write by lines
     lcd.move_to(0,1)
     lcd.putstr(text2.center(spaces_to_center))
 
+def custom_icon(location, char_map):
+    lcd.custom_char(location,char_map)
 
 def waiting_message(message): #Print on LCD and cursor bliking and the end
     reset_waiting()
